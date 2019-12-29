@@ -1,15 +1,15 @@
 extern crate crossterm;
 extern crate futures;
 
-use std::io::{stdout, Write};
+extern crate editor;
 
 use crossterm::{
     event::{Event, EventStream, KeyCode, KeyEvent, MouseEvent},
-    execute,
     Result,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}
 };
 use futures::{future::FutureExt, select, StreamExt};
+
+use editor::terminal;
 
 #[derive(Clone, Copy, Debug)]
 enum EditorEvent {
@@ -70,28 +70,8 @@ async fn main_loop() {
     }
 }
 
-// `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
-// field of `std::err::Err`
-#[allow(deprecated)]
-fn setup_editor() -> Result<()> {
-    execute!(stdout(), EnterAlternateScreen)?;
-    enable_raw_mode()?;
-
-    Ok(())
-}
-
-// `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
-// field of `std::err::Err`
-#[allow(deprecated)]
-fn teardown_editor() -> Result<()> {
-    disable_raw_mode()?;
-    execute!(stdout(), LeaveAlternateScreen)?;
-
-    Ok(())
-}
-
 fn main() -> Result<()> {
-    setup_editor()?;
+    terminal::setup_editor()?;
     async_std::task::block_on(main_loop());
-    teardown_editor()
+    terminal::teardown_editor()
 }
