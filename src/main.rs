@@ -1,10 +1,13 @@
 extern crate crossterm;
 extern crate futures;
 
+use std::io::{stdout, Write};
+
 use crossterm::{
     event::{Event, EventStream, KeyCode, KeyEvent, MouseEvent},
+    execute,
     Result,
-    terminal::{disable_raw_mode, enable_raw_mode}
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}
 };
 use futures::{future::FutureExt, select, StreamExt};
 
@@ -67,11 +70,15 @@ async fn main_loop() {
     }
 }
 
+// `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
+// field of `std::err::Err`
+#[allow(deprecated)]
 fn main() -> Result<()> {
-    println!("Hello, world!");
+    execute!(stdout(), EnterAlternateScreen)?;
     enable_raw_mode()?;
 
     async_std::task::block_on(main_loop());
 
-    disable_raw_mode()
+    disable_raw_mode()?;
+    execute!(stdout(), LeaveAlternateScreen)
 }
