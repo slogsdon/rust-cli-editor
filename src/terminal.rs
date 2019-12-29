@@ -3,7 +3,13 @@ use std::io::{stdout, Write};
 use crossterm::{
     execute,
     Result,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}
+    terminal::{
+        disable_raw_mode,
+        enable_raw_mode,
+        size,
+        EnterAlternateScreen,
+        LeaveAlternateScreen,
+    }
 };
 
 
@@ -26,4 +32,11 @@ pub fn teardown_editor() -> Result<()> {
     execute!(stdout(), LeaveAlternateScreen)?;
 
     Ok(())
+}
+
+pub fn get_window_size() -> (u16, u16) {
+    match size() {
+        Ok((x, y)) => (x, y),
+        Err(_) => (1, 1),
+    }
 }

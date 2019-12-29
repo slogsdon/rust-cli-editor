@@ -8,12 +8,15 @@ use crossterm::{
     Result,
 };
 
-use editor::input::{
-    accept_window_input,
-    handle_window_input,
-    WindowInputEvent,
+use editor::{
+    input::{
+        accept_window_input,
+        handle_window_input,
+        WindowInputEvent,
+    },
+    state::WindowState,
+    terminal,
 };
-use editor::terminal;
 
 fn main() -> Result<()> {
     terminal::setup_editor()?;
@@ -23,7 +26,7 @@ fn main() -> Result<()> {
 
 async fn main_loop() {
     let mut reader = EventStream::new();
-    let mut history = Vec::<WindowInputEvent>::new();
+    let mut state = WindowState::new();
 
     loop {
         let event = accept_window_input(&mut reader).await;
@@ -34,7 +37,7 @@ async fn main_loop() {
             Ok(WindowInputEvent::Exit) => break,
             Ok(e) => {
                 println!("Event: {:?}", e);
-                history.push(e);
+                state.event_history.push(e);
                 handle_window_input(e);
             },
         }
