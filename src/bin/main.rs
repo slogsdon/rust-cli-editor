@@ -48,7 +48,7 @@ async fn accept_editor_event(reader: &mut EventStream) -> Result<EditorEvent> {
     }
 }
 
-fn hande_editor_event(_event: EditorEvent) {}
+fn handle_editor_event(_event: EditorEvent) {}
 
 async fn main_loop() {
     let mut reader = EventStream::new();
@@ -64,7 +64,7 @@ async fn main_loop() {
             Ok(e) => {
                 println!("Event: {:?}", e);
                 history.push(e);
-                hande_editor_event(e);
+                handle_editor_event(e);
             },
         }
     }
