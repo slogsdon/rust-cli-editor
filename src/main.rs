@@ -8,31 +8,36 @@ use crossterm::{
 };
 use futures::{future::FutureExt, select, StreamExt};
 
+async fn accept_keypress(reader: &mut EventStream) {
+    let mut event = reader.next().fuse();
+
+    select! {
+        maybe_event = event => {
+            match maybe_event {
+                Some(Ok(event)) => {
+                    println!("Event::{:?}\r", event);
+
+                    if event == Event::Key(KeyCode::Char('c').into()) {
+                        println!("hi c");
+                    }
+
+                    if event == Event::Key(KeyCode::Esc.into()) {
+                        break;
+                    }
+                }
+                Some(Err(e)) => println!("Error: {:?}\r", e),
+                None => break,
+            }
+        }
+    }
+}
+
 async fn main_loop() {
     let mut reader = EventStream::new();
+    let mut buffer = Vec::<Event>::new();
 
     loop {
-        let mut event = reader.next().fuse();
-
-        select! {
-            maybe_event = event => {
-                match maybe_event {
-                    Some(Ok(event)) => {
-                        println!("Event::{:?}\r", event);
-
-                        if event == Event::Key(KeyCode::Char('c').into()) {
-                            println!("hi c");
-                        }
-
-                        if event == Event::Key(KeyCode::Esc.into()) {
-                            break;
-                        }
-                    }
-                    Some(Err(e)) => println!("Error: {:?}\r", e),
-                    None => break,
-                }
-            }
-        };
+        accept_keypress(&mut reader).await;
     }
 }
 
