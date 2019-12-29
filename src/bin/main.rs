@@ -12,7 +12,7 @@ use futures::{future::FutureExt, select, StreamExt};
 use editor::terminal;
 
 #[derive(Clone, Copy, Debug)]
-enum EditorEvent {
+enum WindowInputEvent {
     NoOp,
     Exit,
     KeyPress(KeyEvent),
@@ -20,7 +20,7 @@ enum EditorEvent {
     Resize(u16, u16),
 }
 
-async fn accept_editor_event(reader: &mut EventStream) -> Result<EditorEvent> {
+async fn accept_window_input(reader: &mut EventStream) -> Result<WindowInputEvent> {
     let mut event = reader.next().fuse();
 
     select! {
@@ -32,35 +32,35 @@ async fn accept_editor_event(reader: &mut EventStream) -> Result<EditorEvent> {
                             let event: KeyEvent = e;
 
                             if event.code == KeyCode::Esc {
-                                return Ok(EditorEvent::Exit);
+                                return Ok(WindowInputEvent::Exit);
                             }
 
-                            Ok(EditorEvent::KeyPress(event))
+                            Ok(WindowInputEvent::KeyPress(event))
                         },
-                        Event::Mouse(e) => Ok(EditorEvent::Mouse(e)),
-                        Event::Resize(x, y) => Ok(EditorEvent::Resize(x, y)),
+                        Event::Mouse(e) => Ok(WindowInputEvent::Mouse(e)),
+                        Event::Resize(x, y) => Ok(WindowInputEvent::Resize(x, y)),
                     }
                 }
                 Some(Err(e)) => Err(e),
-                None => Ok(EditorEvent::NoOp),
+                None => Ok(WindowInputEvent::NoOp),
             }
         }
     }
 }
 
-fn handle_editor_event(_event: EditorEvent) {}
+fn handle_editor_event(_event: WindowInputEvent) {}
 
 async fn main_loop() {
     let mut reader = EventStream::new();
-    let mut history = Vec::<EditorEvent>::new();
+    let mut history = Vec::<WindowInputEvent>::new();
 
     loop {
-        let event = accept_editor_event(&mut reader).await;
+        let event = accept_window_input(&mut reader).await;
 
         match event {
             Err(e) => panic!("Error: {}", e),
-            Ok(EditorEvent::NoOp) => continue,
-            Ok(EditorEvent::Exit) => break,
+            Ok(WindowInputEvent::NoOp) => continue,
+            Ok(WindowInputEvent::Exit) => break,
             Ok(e) => {
                 println!("Event: {:?}", e);
                 history.push(e);
