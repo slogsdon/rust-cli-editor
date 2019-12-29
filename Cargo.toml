@@ -3,6 +3,7 @@ name = "editor"
 version = "0.1.0"
 authors = ["Shane Logsdon <shane@shanelogsdon.com>"]
 edition = "2018"
+license = "MIT"
 
 [dependencies]
 async-std = "1.4"
