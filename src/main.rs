@@ -73,12 +73,25 @@ async fn main_loop() {
 // `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
 // field of `std::err::Err`
 #[allow(deprecated)]
-fn main() -> Result<()> {
+fn setup_editor() -> Result<()> {
     execute!(stdout(), EnterAlternateScreen)?;
     enable_raw_mode()?;
 
-    async_std::task::block_on(main_loop());
+    Ok(())
+}
 
+// `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
+// field of `std::err::Err`
+#[allow(deprecated)]
+fn teardown_editor() -> Result<()> {
     disable_raw_mode()?;
-    execute!(stdout(), LeaveAlternateScreen)
+    execute!(stdout(), LeaveAlternateScreen)?;
+
+    Ok(())
+}
+
+fn main() -> Result<()> {
+    setup_editor()?;
+    async_std::task::block_on(main_loop());
+    teardown_editor()
 }
