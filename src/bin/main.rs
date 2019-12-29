@@ -4,51 +4,22 @@ extern crate futures;
 extern crate editor;
 
 use crossterm::{
-    event::{Event, EventStream, KeyCode, KeyEvent, MouseEvent},
+    event::{EventStream},
     Result,
 };
-use futures::{future::FutureExt, select, StreamExt};
 
+use editor::input::{
+    accept_window_input,
+    handle_window_input,
+    WindowInputEvent,
+};
 use editor::terminal;
 
-#[derive(Clone, Copy, Debug)]
-enum WindowInputEvent {
-    NoOp,
-    Exit,
-    KeyPress(KeyEvent),
-    Mouse(MouseEvent),
-    Resize(u16, u16),
+fn main() -> Result<()> {
+    terminal::setup_editor()?;
+    async_std::task::block_on(main_loop());
+    terminal::teardown_editor()
 }
-
-async fn accept_window_input(reader: &mut EventStream) -> Result<WindowInputEvent> {
-    let mut event = reader.next().fuse();
-
-    select! {
-        maybe_event = event => {
-            match maybe_event {
-                Some(Ok(event)) => {
-                    match event {
-                        Event::Key(e) => {
-                            let event: KeyEvent = e;
-
-                            if event.code == KeyCode::Esc {
-                                return Ok(WindowInputEvent::Exit);
-                            }
-
-                            Ok(WindowInputEvent::KeyPress(event))
-                        },
-                        Event::Mouse(e) => Ok(WindowInputEvent::Mouse(e)),
-                        Event::Resize(x, y) => Ok(WindowInputEvent::Resize(x, y)),
-                    }
-                }
-                Some(Err(e)) => Err(e),
-                None => Ok(WindowInputEvent::NoOp),
-            }
-        }
-    }
-}
-
-fn handle_editor_event(_event: WindowInputEvent) {}
 
 async fn main_loop() {
     let mut reader = EventStream::new();
@@ -64,14 +35,8 @@ async fn main_loop() {
             Ok(e) => {
                 println!("Event: {:?}", e);
                 history.push(e);
-                handle_editor_event(e);
+                handle_window_input(e);
             },
         }
     }
-}
-
-fn main() -> Result<()> {
-    terminal::setup_editor()?;
-    async_std::task::block_on(main_loop());
-    terminal::teardown_editor()
 }
