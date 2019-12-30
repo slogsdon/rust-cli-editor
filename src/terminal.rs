@@ -1,18 +1,13 @@
 /// Interface for the terminal environment
-
-use std::io::{stdout, Write};
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
     execute,
-    Result,
     terminal::{
-        disable_raw_mode,
-        enable_raw_mode,
-        size,
-        EnterAlternateScreen,
-        LeaveAlternateScreen,
-    }
+        disable_raw_mode, enable_raw_mode, size, EnterAlternateScreen, LeaveAlternateScreen,
+    },
+    Result,
 };
+use std::io::{stdout, Write};
 
 /// Prepares editor environment. Should be followed by
 /// `teardown_editor`.

@@ -1,5 +1,4 @@
 /// Provides ability to track application input
-
 use crossterm::{
     event::{Event, EventStream, KeyCode, KeyEvent, MouseEvent},
     Result,
@@ -36,7 +35,7 @@ impl WindowInputEvent {
                 }
 
                 WindowInputEvent::KeyPress(event)
-            },
+            }
             Event::Mouse(e) => WindowInputEvent::Mouse(e),
             Event::Resize(x, y) => WindowInputEvent::Resize(x, y),
         }

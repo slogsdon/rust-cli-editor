@@ -1,9 +1,5 @@
 /// Provides options for maintaining application state
-
-use super::{
-    input::WindowInputEvent,
-    terminal::get_window_dimensions,
-};
+use super::{input::WindowInputEvent, terminal::get_window_dimensions};
 
 /// Window state for the editor
 pub struct WindowState {

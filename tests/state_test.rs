@@ -1,4 +1,4 @@
-use editor::state::{WindowState};
+use editor::state::WindowState;
 
 #[test]
 fn new() {

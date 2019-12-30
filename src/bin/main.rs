@@ -1,15 +1,7 @@
-use crossterm::{
-    ErrorKind,
-    event::{EventStream},
-    Result,
-};
+use crossterm::{event::EventStream, ErrorKind, Result};
 
 use editor::{
-    input::{
-        accept_window_input,
-        handle_window_input,
-        WindowInputEvent,
-    },
+    input::{accept_window_input, handle_window_input, WindowInputEvent},
     state::WindowState,
     terminal,
 };
@@ -32,13 +24,13 @@ async fn main_loop() -> Result<()> {
             Err(e) => {
                 error = Some(e);
                 break;
-            },
+            }
             Ok(WindowInputEvent::NoOp) => continue,
             Ok(WindowInputEvent::Exit) => break,
             Ok(e) => {
                 state.input_event_history.push(e);
                 handle_window_input(e);
-            },
+            }
         }
     }
 

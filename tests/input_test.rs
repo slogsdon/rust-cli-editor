@@ -1,12 +1,6 @@
-use crossterm::event::{
-  Event,
-  KeyCode,
-  KeyEvent,
-  KeyModifiers,
-  MouseEvent,
-};
+use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers, MouseEvent};
 
-use editor::input::{WindowInputEvent};
+use editor::input::WindowInputEvent;
 
 #[test]
 fn window_input_event_from_crossterm_event_handles_key_event() {
