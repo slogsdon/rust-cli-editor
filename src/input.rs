@@ -57,4 +57,20 @@ pub async fn accept_window_input(reader: &mut EventStream) -> Result<WindowInput
     }
 }
 
-pub fn handle_window_input(_event: WindowInputEvent) {}
+pub fn handle_window_input(event: WindowInputEvent) {
+    match event {
+        WindowInputEvent::Exit => (),
+        WindowInputEvent::NoOp => (),
+        WindowInputEvent::Resize(_, _) => (),
+        WindowInputEvent::Mouse(_) => (),
+        WindowInputEvent::KeyPress(e) => {
+            if let KeyCode::Char(c) = e.code {
+                print!("{}", c);
+            }
+
+            if KeyCode::Enter == e.code {
+                print!("\r\n");
+            }
+        }
+    }
+}
