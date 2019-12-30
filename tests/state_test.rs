@@ -4,5 +4,5 @@ use editor::state::{WindowState};
 fn new() {
     let state = WindowState::new();
 
-    assert_eq!(state.event_history.len(), 0);
+    assert_eq!(state.input_event_history.len(), 0);
 }

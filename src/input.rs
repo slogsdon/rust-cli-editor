@@ -1,15 +1,26 @@
+/// Provides ability to track application input
+
 use crossterm::{
     event::{Event, EventStream, KeyCode, KeyEvent, MouseEvent},
     Result,
 };
 use futures::{future::FutureExt, select, StreamExt};
 
+/// Window/user input event
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub enum WindowInputEvent {
+    /// No operation
+    ///
+    /// Should occur only when no input is received before the
+    /// event stream times out, etc.
     NoOp,
+    /// User has requested to exit the application
     Exit,
+    /// User has performed keyboard input
     KeyPress(KeyEvent),
+    /// User has performed mouse input
     Mouse(MouseEvent),
+    /// User has resized the terminal emulator window
     Resize(u16, u16),
 }
 

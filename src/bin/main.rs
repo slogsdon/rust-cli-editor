@@ -1,4 +1,5 @@
 use crossterm::{
+    ErrorKind,
     event::{EventStream},
     Result,
 };
@@ -20,7 +21,7 @@ fn main() -> Result<()> {
 }
 
 async fn main_loop() -> Result<()> {
-    let mut error: Option<crossterm::ErrorKind> = None;
+    let mut error: Option<ErrorKind> = None;
     let mut reader = EventStream::new();
     let mut state = WindowState::new();
 
@@ -35,7 +36,7 @@ async fn main_loop() -> Result<()> {
             Ok(WindowInputEvent::NoOp) => continue,
             Ok(WindowInputEvent::Exit) => break,
             Ok(e) => {
-                state.event_history.push(e);
+                state.input_event_history.push(e);
                 handle_window_input(e);
             },
         }

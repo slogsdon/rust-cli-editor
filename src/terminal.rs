@@ -1,5 +1,6 @@
-use std::io::{stdout, Write};
+/// Interface for the terminal environment
 
+use std::io::{stdout, Write};
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
     execute,
@@ -13,10 +14,23 @@ use crossterm::{
     }
 };
 
-
+/// Prepares editor environment. Should be followed by
+/// `teardown_editor`.
+///
+/// Example:
+///
+/// ```no_run
+/// use crossterm::Result;
+/// use editor::terminal::{setup_editor, teardown_editor};
+///
+/// fn main() -> Result<()> {
+///     setup_editor()?;
+///     // perform tasks
+///     teardown_editor()
+/// }
+#[allow(deprecated)]
 // `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
 // field of `std::err::Err`
-#[allow(deprecated)]
 pub fn setup_editor() -> Result<()> {
     execute!(stdout(), EnterAlternateScreen)?;
     execute!(stdout(), EnableMouseCapture)?;
@@ -25,10 +39,22 @@ pub fn setup_editor() -> Result<()> {
     Ok(())
 }
 
-
+/// Resets editor environment to original state
+///
+/// Example:
+///
+/// ```no_run
+/// use crossterm::Result;
+/// use editor::terminal::{setup_editor, teardown_editor};
+///
+/// fn main() -> Result<()> {
+///     setup_editor()?;
+///     // perform tasks
+///     teardown_editor()
+/// }
+#[allow(deprecated)]
 // `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
 // field of `std::err::Err`
-#[allow(deprecated)]
 pub fn teardown_editor() -> Result<()> {
     disable_raw_mode()?;
     execute!(stdout(), DisableMouseCapture)?;
@@ -37,9 +63,23 @@ pub fn teardown_editor() -> Result<()> {
     Ok(())
 }
 
-pub fn get_window_size() -> (u16, u16) {
+/// Gets current window dimensions
+///
+/// Return value is a two element tuple representing the width
+/// as the first element and the height as the second element.
+/// Default value is `(1, 1)`.
+///
+/// Example:
+///
+/// ```
+/// use editor::terminal::get_window_dimensions;
+/// let (width, height) = get_window_dimensions();
+/// assert_ne!(width, 0);
+/// assert_ne!(height, 0);
+/// ```
+pub fn get_window_dimensions() -> (u16, u16) {
     match size() {
-        Ok((x, y)) => (x, y),
+        Ok((width, height)) => (width, height),
         Err(_) => (1, 1),
     }
 }
