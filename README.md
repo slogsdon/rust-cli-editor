@@ -4,7 +4,7 @@
 
 ### Features
 
-- Minimal dependencies
+- Minimal direct dependencies
 
 ## License
 
