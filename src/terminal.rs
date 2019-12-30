@@ -23,6 +23,7 @@ use std::io::{stdout, Write};
 ///     // perform tasks
 ///     teardown_editor()
 /// }
+/// ```
 #[allow(deprecated)]
 // `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
 // field of `std::err::Err`
@@ -47,6 +48,7 @@ pub fn setup_editor() -> Result<()> {
 ///     // perform tasks
 ///     teardown_editor()
 /// }
+/// ```
 #[allow(deprecated)]
 // `EnterAlternateScreen` and `LeaveAlternateScreen` use a deprecated
 // field of `std::err::Err`
