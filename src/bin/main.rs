@@ -40,7 +40,6 @@ async fn main_loop() -> Result<()> {
             Ok(WindowInputEvent::NoOp) => continue,
             Ok(WindowInputEvent::Exit) => break,
             Ok(e) => {
-                println!("Event: {:?}", e);
                 state.event_history.push(e);
                 handle_window_input(e);
             },
