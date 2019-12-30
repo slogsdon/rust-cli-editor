@@ -1,8 +1,3 @@
-extern crate crossterm;
-extern crate futures;
-
-extern crate editor;
-
 use crossterm::{
     event::{EventStream},
     Result,
