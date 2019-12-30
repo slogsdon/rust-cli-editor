@@ -1,7 +1,7 @@
-use crossterm::{event::EventStream, ErrorKind, Result};
+use crossterm::Result;
 
 use editor::{
-    input::{accept_window_input, handle_window_input, WindowInputEvent},
+    input::{accept_window_input, WindowInputEvent},
     state::WindowState,
     terminal,
 };
@@ -13,30 +13,16 @@ fn main() -> Result<()> {
 }
 
 async fn main_loop() -> Result<()> {
-    let mut error: Option<ErrorKind> = None;
-    let mut reader = EventStream::new();
     let mut state = WindowState::new();
 
     loop {
-        let event = accept_window_input(&mut reader).await;
-
-        match event {
-            Err(e) => {
-                error = Some(e);
-                break;
-            }
+        match accept_window_input(&mut state).await {
+            Err(e) => return Err(e),
+            Ok(WindowInputEvent::Exit) => return Ok(()),
             Ok(WindowInputEvent::NoOp) => continue,
-            Ok(WindowInputEvent::Exit) => break,
-            Ok(e) => {
-                state.input_event_history.push(e);
-                handle_window_input(e);
-            }
+            Ok(_) => render(&mut state).await,
         }
     }
-
-    if let Some(e) = error {
-        return Err(e);
-    }
-
-    Ok(())
 }
+
+async fn render(_state: &mut WindowState) {}

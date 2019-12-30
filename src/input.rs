@@ -1,9 +1,11 @@
 /// Provides ability to track application input
 use crossterm::{
-    event::{Event, EventStream, KeyCode, KeyEvent, MouseEvent},
+    event::{Event, KeyCode, KeyEvent, MouseEvent},
     Result,
 };
 use futures::{future::FutureExt, select, StreamExt};
+
+use super::state::WindowState;
 
 /// Window/user input event
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
@@ -42,13 +44,13 @@ impl WindowInputEvent {
     }
 }
 
-pub async fn accept_window_input(reader: &mut EventStream) -> Result<WindowInputEvent> {
-    let mut event = reader.next().fuse();
+pub async fn accept_window_input(state: &mut WindowState) -> Result<WindowInputEvent> {
+    let mut event = state.event_reader.next().fuse();
 
     select! {
         maybe_event = event => {
             match maybe_event {
-                Some(Ok(e)) => Ok(WindowInputEvent::from_crossterm_event(e)),
+                Some(Ok(e)) => Ok(handle_window_input(state, WindowInputEvent::from_crossterm_event(e))),
                 Some(Err(e)) => Err(e),
                 None => Ok(WindowInputEvent::NoOp),
             }
@@ -56,20 +58,22 @@ pub async fn accept_window_input(reader: &mut EventStream) -> Result<WindowInput
     }
 }
 
-pub fn handle_window_input(event: WindowInputEvent) {
-    match event {
-        WindowInputEvent::Exit => (),
-        WindowInputEvent::NoOp => (),
-        WindowInputEvent::Resize(_, _) => (),
-        WindowInputEvent::Mouse(_) => (),
-        WindowInputEvent::KeyPress(e) => {
-            if let KeyCode::Char(c) = e.code {
-                print!("{}", c);
-            }
+pub fn handle_window_input(state: &mut WindowState, event: WindowInputEvent) -> WindowInputEvent {
+    state.input_event_history.push(event);
 
-            if KeyCode::Enter == e.code {
-                print!("\r\n");
-            }
+    if let WindowInputEvent::KeyPress(e) = event {
+        if let KeyCode::Char(c) = e.code {
+            print!("{}", c);
+        }
+
+        if KeyCode::Enter == e.code {
+            print!("\r\n");
         }
     }
+
+    if let WindowInputEvent::Resize(width, height) = event {
+        state.dimensions = (width, height);
+    }
+
+    event
 }
