@@ -3,6 +3,13 @@ use super::{input::WindowInputEvent, terminal::get_window_dimensions};
 
 /// Window state for the editor
 pub struct WindowState {
+    /// Current cursor position
+    ///
+    /// Represented as a two element tuple with the x position as
+    /// the first element and the y position as the second element.
+    ///
+    /// Initial value is `(0, 0)`.
+    pub cursor_position: (u16, u16),
     /// Current window dimensions
     ///
     /// Represented as a two element tuple with the width as
@@ -24,6 +31,7 @@ impl WindowState {
     /// ```
     pub fn new() -> WindowState {
         WindowState {
+            cursor_position: (0, 0),
             dimensions: get_window_dimensions(),
             input_event_history: Vec::<WindowInputEvent>::new(),
         }
