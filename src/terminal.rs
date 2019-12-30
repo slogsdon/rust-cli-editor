@@ -1,6 +1,7 @@
 use std::io::{stdout, Write};
 
 use crossterm::{
+    event::{DisableMouseCapture, EnableMouseCapture},
     execute,
     Result,
     terminal::{
@@ -18,6 +19,7 @@ use crossterm::{
 #[allow(deprecated)]
 pub fn setup_editor() -> Result<()> {
     execute!(stdout(), EnterAlternateScreen)?;
+    execute!(stdout(), EnableMouseCapture)?;
     enable_raw_mode()?;
 
     Ok(())
@@ -29,6 +31,7 @@ pub fn setup_editor() -> Result<()> {
 #[allow(deprecated)]
 pub fn teardown_editor() -> Result<()> {
     disable_raw_mode()?;
+    execute!(stdout(), DisableMouseCapture)?;
     execute!(stdout(), LeaveAlternateScreen)?;
 
     Ok(())
