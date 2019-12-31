@@ -4,7 +4,7 @@ use editor::{
     input::{accept_window_input, WindowInputEvent},
     state::WindowState,
     terminal,
-    ui::render,
+    ui::{reset_screen, render},
 };
 
 /// Application's entrypoint
@@ -24,12 +24,21 @@ fn main() -> Result<()> {
 async fn main_loop() -> Result<()> {
     let mut state = WindowState::new();
 
+    // initial render to ensure screen is cleared and cursor
+    // is placed at the intended first position
+    reset_screen(&state)?;
+    render(&mut state)?;
+
     loop {
         match accept_window_input(&mut state).await {
             Err(e) => return Err(e),
             Ok(WindowInputEvent::Exit) => return Ok(()),
             Ok(WindowInputEvent::NoOp) => continue,
-            Ok(_) => render(&mut state).await,
+            Ok(_) => {
+                if let Err(e) = render(&mut state) {
+                    return Err(e);
+                }
+            }
         }
     }
 }

@@ -59,17 +59,7 @@ pub async fn accept_window_input(state: &mut WindowState) -> Result<WindowInputE
 }
 
 pub fn handle_window_input(state: &mut WindowState, event: WindowInputEvent) -> WindowInputEvent {
-    state.input_event_history.push(event);
-
-    if let WindowInputEvent::KeyPress(e) = event {
-        if let KeyCode::Char(c) = e.code {
-            print!("{}", c);
-        }
-
-        if KeyCode::Enter == e.code {
-            print!("\r\n");
-        }
-    }
+    state.push_input_event(event);
 
     if let WindowInputEvent::Resize(width, height) = event {
         state.dimensions = (width, height);

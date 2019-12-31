@@ -33,12 +33,31 @@ impl WindowState {
     /// let state = WindowState::new();
     /// assert_eq!(state.input_event_history.len(), 0);
     /// ```
-    pub fn new() -> WindowState {
+    pub fn new() -> Self {
         WindowState {
             cursor_position: (0, 0),
             dimensions: get_window_dimensions(),
             event_reader: EventStream::new(),
             input_event_history: Vec::<WindowInputEvent>::new(),
+        }
+    }
+
+    pub fn push_input_event(&mut self, event: WindowInputEvent) {
+        self.input_event_history.push(event)
+    }
+
+    pub fn last_input_event(&self) -> Option<&WindowInputEvent> {
+        self.input_event_history.last()
+    }
+}
+
+impl Clone for WindowState {
+    fn clone(&self) -> Self {
+        WindowState {
+            cursor_position: self.cursor_position,
+            dimensions: self.dimensions,
+            event_reader: EventStream::new(),
+            input_event_history: Vec::new(),
         }
     }
 }
