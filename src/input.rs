@@ -25,8 +25,8 @@ pub enum WindowInputEvent {
     Resize(u16, u16),
 }
 
-impl WindowInputEvent {
-    pub fn from_crossterm_event(event: Event) -> WindowInputEvent {
+impl From<Event> for WindowInputEvent {
+    fn from(event: Event) -> Self {
         match event {
             Event::Key(e) => {
                 let event: KeyEvent = e;
@@ -50,7 +50,7 @@ pub async fn accept_window_input(state: &mut WindowState) -> Result<WindowInputE
     select! {
         maybe_event = event => {
             match maybe_event {
-                Some(Ok(e)) => Ok(handle_window_input(state, WindowInputEvent::from_crossterm_event(e))),
+                Some(Ok(e)) => Ok(handle_window_input(state, WindowInputEvent::from(e))),
                 Some(Err(e)) => Err(e),
                 None => Ok(WindowInputEvent::NoOp),
             }
