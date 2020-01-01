@@ -23,6 +23,7 @@ pub struct WindowState {
     pub event_reader: EventStream,
     /// Vector of all window input events
     pub input_event_history: Vec<WindowInputEvent>,
+    pub statusline_format: String,
 }
 
 impl WindowState {
@@ -43,6 +44,7 @@ impl WindowState {
             dimensions: get_window_dimensions(),
             event_reader: EventStream::new(),
             input_event_history: Vec::new(),
+            statusline_format: String::from("L: {line}, C: {column}"),
         }
     }
 
@@ -81,6 +83,7 @@ impl Clone for WindowState {
             dimensions: self.dimensions,
             event_reader: EventStream::new(),
             input_event_history: Vec::new(),
+            statusline_format: String::new(),
         }
     }
 }

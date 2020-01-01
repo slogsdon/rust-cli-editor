@@ -10,6 +10,7 @@ use super::state::WindowState;
 pub fn render(state: &WindowState) -> Result<()> {
     clear_screen()?;
     render_content(state)?;
+    render_statusline(state)?;
 
     match stdout().flush() {
         Ok(_) => Ok(()),
@@ -23,6 +24,26 @@ fn render_content(state: &WindowState) -> Result<()> {
         place_cursor((0, i.try_into().unwrap()))?;
         print_text(state, format_args!("{}", line))?;
     }
+
+    Ok(())
+}
+
+fn render_statusline(state: &WindowState) -> Result<()> {
+    let (_, height) = state.dimensions;
+    place_cursor((0, height - 1))?;
+    let (x, y) = state.cursor_position;
+    let line: String = format!("{}", y + 1);
+    let column: String = format!("{}", x + 1);
+    print_text(
+        state,
+        format_args!(
+            "{}",
+            state
+                .statusline_format
+                .replace("{line}", line.as_str())
+                .replace("{column}", column.as_str())
+        ),
+    )?;
 
     Ok(())
 }
