@@ -14,5 +14,5 @@ before_install:
 
 script:
   - cargo build --verbose
-  - cargo clippy -- -D clippy
+  - cargo clippy -- -D clippy::all
   - cargo test --verbose
