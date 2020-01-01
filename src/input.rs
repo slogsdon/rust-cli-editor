@@ -28,16 +28,7 @@ pub enum WindowInputEvent {
 impl From<Event> for WindowInputEvent {
     fn from(event: Event) -> Self {
         match event {
-            Event::Key(e) => {
-                let event: KeyEvent = e;
-
-                // TODO: remove with command mode
-                if event.code == KeyCode::Esc {
-                    return WindowInputEvent::Exit;
-                }
-
-                WindowInputEvent::KeyPress(event)
-            }
+            Event::Key(e) => WindowInputEvent::KeyPress(e),
             Event::Mouse(e) => WindowInputEvent::Mouse(e),
             Event::Resize(x, y) => WindowInputEvent::Resize(x, y),
         }
@@ -59,24 +50,30 @@ pub async fn accept_window_input(state: &mut WindowState) -> Result<WindowInputE
     }
 }
 
-pub fn handle_window_input(state: &mut WindowState, event: WindowInputEvent) -> WindowInputEvent {
+pub fn handle_window_input(
+    state: &mut WindowState,
+    mut event: WindowInputEvent,
+) -> WindowInputEvent {
     state.push_input_event(event);
 
     match event {
         WindowInputEvent::Resize(width, height) => state.dimensions = (width, height),
-        WindowInputEvent::KeyPress(key_event) => handle_key_press(state, key_event),
+        WindowInputEvent::KeyPress(key_event) => event = handle_key_press(state, key_event),
         _ => (),
     }
 
     event
 }
 
-fn handle_key_press(state: &mut WindowState, key_event: KeyEvent) {
+fn handle_key_press(state: &mut WindowState, key_event: KeyEvent) -> WindowInputEvent {
     let default = String::new();
     let mut line = String::from(state.last_content_line_or(&default));
     let mut should_push = false;
 
     match key_event.code {
+        KeyCode::Esc => {
+            return WindowInputEvent::Exit;
+        }
         KeyCode::Enter => {
             line = default;
             should_push = true;
@@ -91,9 +88,10 @@ fn handle_key_press(state: &mut WindowState, key_event: KeyEvent) {
 
     if should_push || state.content.is_empty() {
         state.content.push(line);
-        return;
+    } else {
+        let idx = state.content.len() - 1;
+        std::mem::replace(&mut state.content[idx], line);
     }
 
-    let idx = state.content.len() - 1;
-    std::mem::replace(&mut state.content[idx], line);
+    WindowInputEvent::KeyPress(key_event)
 }
