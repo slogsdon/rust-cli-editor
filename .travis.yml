@@ -8,3 +8,11 @@ jobs:
   allow_failures:
     - rust: nightly
   fast_finish: true
+
+before_install:
+  - rustup component add clippy
+
+script:
+  - cargo build --verbose
+  - cargo clippy -- -D clippy
+  - cargo test --verbose
