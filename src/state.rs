@@ -5,6 +5,8 @@ use super::{input::WindowInputEvent, terminal::get_window_dimensions};
 
 /// Window state for the editor
 pub struct WindowState {
+    /// Current content
+    pub content: Vec<String>,
     /// Current cursor position
     ///
     /// Represented as a two element tuple with the x position as
@@ -35,10 +37,22 @@ impl WindowState {
     /// ```
     pub fn new() -> Self {
         WindowState {
+            content: Vec::new(),
             cursor_position: (0, 0),
             dimensions: get_window_dimensions(),
             event_reader: EventStream::new(),
-            input_event_history: Vec::<WindowInputEvent>::new(),
+            input_event_history: Vec::new(),
+        }
+    }
+
+    pub fn last_content_line(&self) -> Option<&String> {
+        self.content.last()
+    }
+
+    pub fn last_content_line_or<'a>(&'a self, default: &'a String) -> &'a String {
+        match self.last_content_line() {
+            Some(s) => s,
+            None => default,
         }
     }
 
@@ -49,11 +63,19 @@ impl WindowState {
     pub fn last_input_event(&self) -> Option<&WindowInputEvent> {
         self.input_event_history.last()
     }
+
+    pub fn update_cursor_position<F>(&mut self, f: F)
+    where
+        F: Fn((u16, u16)) -> (u16, u16),
+    {
+        self.cursor_position = f(self.cursor_position)
+    }
 }
 
 impl Clone for WindowState {
     fn clone(&self) -> Self {
         WindowState {
+            content: Vec::new(),
             cursor_position: self.cursor_position,
             dimensions: self.dimensions,
             event_reader: EventStream::new(),

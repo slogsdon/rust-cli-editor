@@ -1,32 +1,14 @@
-use crossterm::event::{KeyCode,KeyEvent};
 use crossterm::{cursor, queue, style, terminal, ErrorKind, Result};
 use std::{
     fmt::Arguments,
     io::{stdout, Write},
 };
 
-use super::{input::WindowInputEvent, state::WindowState};
+use super::state::WindowState;
 
-pub fn render(state: &mut WindowState) -> Result<()> {
-    let event: &WindowInputEvent;
-    let state_clone = state.clone();
-
-    match state_clone.last_input_event() {
-        None => return Ok(()),
-        Some(e) => event = e,
-    }
-
-    match event {
-        WindowInputEvent::Exit => (),
-        WindowInputEvent::NoOp => (),
-        // TODO: render mouse event
-        WindowInputEvent::Mouse(_) => (),
-        // TODO: render resize event
-        WindowInputEvent::Resize(_,_) => (),
-        WindowInputEvent::KeyPress(key_event) => {
-            let _ = render_key_press(state, key_event);
-        }
-    }
+pub fn render(state: &WindowState) -> Result<()> {
+    clear_screen()?;
+    render_content(state)?;
 
     match stdout().flush() {
         Ok(v) => Ok(v),
@@ -34,24 +16,15 @@ pub fn render(state: &mut WindowState) -> Result<()> {
     }
 }
 
-fn render_key_press(state: &mut WindowState, key_event: &KeyEvent) -> Result<()> {
-    let mut c = '\0';
-
-    match key_event.code {
-        KeyCode::Enter => {
-            c = '\r';
-            let (x,y) = state.cursor_position;
-            state.cursor_position = (x, y+1);
-        }
-        KeyCode::Char(ch) => {
-            c = ch;
-            let (x,y) = state.cursor_position;
-            state.cursor_position = (x+1, y);
-        }
-        _ => (),
+fn render_content(state: &WindowState) -> Result<()> {
+    let mut i: u16 = 0;
+    for line in state.content.iter() {
+        place_cursor((0, i))?;
+        print_text(state, format_args!("{}", line))?;
+        i += 1;
     }
 
-    print_text(state, format_args!("{}", c))
+    Ok(())
 }
 
 #[allow(deprecated)]
@@ -62,8 +35,7 @@ pub fn clear_screen() -> Result<()> {
 
 #[allow(deprecated)]
 // `cursor::MoveTo` uses a deprecated field of `std::err::Err`
-pub fn place_cursor(state: &WindowState) -> Result<()> {
-    let (x, y) = state.cursor_position;
+pub fn place_cursor((x, y): (u16, u16)) -> Result<()> {
     queue!(stdout(), cursor::MoveTo(x, y))
 }
 
@@ -71,10 +43,10 @@ pub fn place_cursor(state: &WindowState) -> Result<()> {
 // `style::Print` uses a deprecated field of `std::err::Err`
 pub fn print_text(state: &WindowState, format_args: Arguments) -> Result<()> {
     queue!(stdout(), style::Print(format_args))?;
-    place_cursor(state)
+    place_cursor(state.cursor_position)
 }
 
 pub fn reset_screen(state: &WindowState) -> Result<()> {
     clear_screen()?;
-    place_cursor(state)
+    place_cursor(state.cursor_position)
 }

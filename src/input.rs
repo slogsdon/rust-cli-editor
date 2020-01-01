@@ -65,5 +65,39 @@ pub fn handle_window_input(state: &mut WindowState, event: WindowInputEvent) -> 
         state.dimensions = (width, height);
     }
 
+    match event {
+        WindowInputEvent::KeyPress(key_event) => {
+            let _ = handle_key_press(state, key_event);
+        }
+        _ => (),
+    }
+
     event
+}
+
+fn handle_key_press(state: &mut WindowState, key_event: KeyEvent) {
+    let default = String::new();
+    let mut line = state.last_content_line_or(&default).clone();
+    let mut should_push = false;
+
+    match key_event.code {
+        KeyCode::Enter => {
+            line = default.clone();
+            should_push = true;
+            state.update_cursor_position(|(_, y)| (0, y + 1));
+        }
+        KeyCode::Char(ch) => {
+            let _ = line.push(ch);
+            state.update_cursor_position(|(x, y)| (x + 1, y));
+        }
+        _ => (),
+    }
+
+    if should_push || state.content.len() == 0 {
+        state.content.push(line.to_string());
+        return;
+    }
+
+    let idx = state.content.len() - 1;
+    std::mem::replace(&mut state.content[idx], line.to_string());
 }
