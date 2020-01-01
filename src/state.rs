@@ -35,6 +35,7 @@ impl WindowState {
     /// let state = WindowState::new();
     /// assert_eq!(state.input_event_history.len(), 0);
     /// ```
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         WindowState {
             content: Vec::new(),
@@ -49,7 +50,7 @@ impl WindowState {
         self.content.last()
     }
 
-    pub fn last_content_line_or<'a>(&'a self, default: &'a String) -> &'a String {
+    pub fn last_content_line_or<'a>(&'a self, default: &'a str) -> &'a str {
         match self.last_content_line() {
             Some(s) => s,
             None => default,

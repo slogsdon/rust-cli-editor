@@ -44,6 +44,7 @@ impl From<Event> for WindowInputEvent {
     }
 }
 
+#[allow(clippy::unnecessary_mut_passed)]
 pub async fn accept_window_input(state: &mut WindowState) -> Result<WindowInputEvent> {
     let mut event = state.event_reader.next().fuse();
 
@@ -61,14 +62,9 @@ pub async fn accept_window_input(state: &mut WindowState) -> Result<WindowInputE
 pub fn handle_window_input(state: &mut WindowState, event: WindowInputEvent) -> WindowInputEvent {
     state.push_input_event(event);
 
-    if let WindowInputEvent::Resize(width, height) = event {
-        state.dimensions = (width, height);
-    }
-
     match event {
-        WindowInputEvent::KeyPress(key_event) => {
-            let _ = handle_key_press(state, key_event);
-        }
+        WindowInputEvent::Resize(width, height) => state.dimensions = (width, height),
+        WindowInputEvent::KeyPress(key_event) => handle_key_press(state, key_event),
         _ => (),
     }
 
@@ -77,27 +73,27 @@ pub fn handle_window_input(state: &mut WindowState, event: WindowInputEvent) -> 
 
 fn handle_key_press(state: &mut WindowState, key_event: KeyEvent) {
     let default = String::new();
-    let mut line = state.last_content_line_or(&default).clone();
+    let mut line = String::from(state.last_content_line_or(&default));
     let mut should_push = false;
 
     match key_event.code {
         KeyCode::Enter => {
-            line = default.clone();
+            line = default;
             should_push = true;
             state.update_cursor_position(|(_, y)| (0, y + 1));
         }
         KeyCode::Char(ch) => {
-            let _ = line.push(ch);
+            line.push(ch);
             state.update_cursor_position(|(x, y)| (x + 1, y));
         }
         _ => (),
     }
 
-    if should_push || state.content.len() == 0 {
-        state.content.push(line.to_string());
+    if should_push || state.content.is_empty() {
+        state.content.push(line);
         return;
     }
 
     let idx = state.content.len() - 1;
-    std::mem::replace(&mut state.content[idx], line.to_string());
+    std::mem::replace(&mut state.content[idx], line);
 }

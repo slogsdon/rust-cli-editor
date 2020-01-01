@@ -1,5 +1,6 @@
 use crossterm::{cursor, queue, style, terminal, ErrorKind, Result};
 use std::{
+    convert::TryInto,
     fmt::Arguments,
     io::{stdout, Write},
 };
@@ -11,17 +12,16 @@ pub fn render(state: &WindowState) -> Result<()> {
     render_content(state)?;
 
     match stdout().flush() {
-        Ok(v) => Ok(v),
+        Ok(_) => Ok(()),
         Err(e) => Err(ErrorKind::IoError(e)),
     }
 }
 
+// TODO: Account for viewable space / bounds from window dimensions
 fn render_content(state: &WindowState) -> Result<()> {
-    let mut i: u16 = 0;
-    for line in state.content.iter() {
-        place_cursor((0, i))?;
+    for (i, line) in state.content.iter().enumerate() {
+        place_cursor((0, i.try_into().unwrap()))?;
         print_text(state, format_args!("{}", line))?;
-        i += 1;
     }
 
     Ok(())
