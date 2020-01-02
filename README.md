@@ -6,6 +6,15 @@
 ### Features
 
 - Minimal direct dependencies
+- Modal editing
+
+### TODO
+
+- Read from / Write to file
+- Easy command definitions
+- Language Server Protocol support?
+- Plugins?
+- Syntax hightlighting?
 
 ## License
 
