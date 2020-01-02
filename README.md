@@ -1,4 +1,5 @@
 # `editor`
+[![Build Status](https://travis-ci.com/slogsdon/rust-cli-editor.svg?branch=master)](https://travis-ci.com/slogsdon/rust-cli-editor)
 
 > Toy CLI text editor
 
