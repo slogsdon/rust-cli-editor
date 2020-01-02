@@ -5,12 +5,17 @@ use std::{
     io::{stdout, Write},
 };
 
-use super::state::WindowState;
+use super::state::{InputMode, WindowState};
 
 pub fn render(state: &WindowState) -> Result<()> {
     clear_screen()?;
     render_content(state)?;
-    render_statusline(state)?;
+
+    if state.input_mode == InputMode::CommandMode {
+        render_commandline(state)?;
+    } else {
+        render_statusline(state)?;
+    }
 
     match stdout().flush() {
         Ok(_) => Ok(()),
@@ -28,12 +33,23 @@ fn render_content(state: &WindowState) -> Result<()> {
     Ok(())
 }
 
+fn render_commandline(state: &WindowState) -> Result<()> {
+    let (_, height) = state.dimensions;
+    place_cursor((0, height - 1))?;
+    print_text(state, format_args!(":{}", state.command))
+}
+
 fn render_statusline(state: &WindowState) -> Result<()> {
     let (_, height) = state.dimensions;
     place_cursor((0, height - 1))?;
     let (x, y) = state.cursor_position;
     let line: String = format!("{}", y + 1);
     let column: String = format!("{}", x + 1);
+    let mode = match state.input_mode {
+        InputMode::NormalMode => "Normal",
+        InputMode::InsertMode => "Insert",
+        InputMode::CommandMode => "Command",
+    };
     print_text(
         state,
         format_args!(
@@ -42,10 +58,9 @@ fn render_statusline(state: &WindowState) -> Result<()> {
                 .statusline_format
                 .replace("{line}", line.as_str())
                 .replace("{column}", column.as_str())
+                .replace("{mode}", mode)
         ),
-    )?;
-
-    Ok(())
+    )
 }
 
 #[allow(deprecated)]

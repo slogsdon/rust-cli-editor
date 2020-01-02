@@ -3,8 +3,16 @@ use crossterm::event::EventStream;
 
 use super::{input::WindowInputEvent, terminal::get_window_dimensions};
 
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
+pub enum InputMode {
+    NormalMode,
+    InsertMode,
+    CommandMode,
+}
+
 /// Window state for the editor
 pub struct WindowState {
+    pub command: String,
     /// Current content
     pub content: Vec<String>,
     /// Current cursor position
@@ -23,6 +31,7 @@ pub struct WindowState {
     pub event_reader: EventStream,
     /// Vector of all window input events
     pub input_event_history: Vec<WindowInputEvent>,
+    pub input_mode: InputMode,
     pub statusline_format: String,
 }
 
@@ -39,12 +48,14 @@ impl WindowState {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         WindowState {
+            command: String::new(),
             content: Vec::new(),
             cursor_position: (0, 0),
             dimensions: get_window_dimensions(),
             event_reader: EventStream::new(),
             input_event_history: Vec::new(),
-            statusline_format: String::from("L: {line}, C: {column}"),
+            input_mode: InputMode::NormalMode,
+            statusline_format: String::from("[{mode}] L: {line}, C: {column}"),
         }
     }
 
@@ -78,11 +89,13 @@ impl WindowState {
 impl Clone for WindowState {
     fn clone(&self) -> Self {
         WindowState {
+            command: String::new(),
             content: Vec::new(),
             cursor_position: self.cursor_position,
             dimensions: self.dimensions,
             event_reader: EventStream::new(),
             input_event_history: Vec::new(),
+            input_mode: self.input_mode,
             statusline_format: String::new(),
         }
     }
