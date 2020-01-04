@@ -88,11 +88,11 @@ fn handle_key_press_normal(state: &mut WindowState, key_event: KeyEvent) -> Wind
             state.update_cursor_position(|(x, y)| (if x > 0 { x - 1 } else { 0 }, y));
             WindowInputEvent::KeyPress(key_event)
         }
-        KeyCode::Char('j') => {
+        KeyCode::Char('k') => {
             state.update_cursor_position(|(x, y)| (x, if y > 0 { y - 1 } else { 0 }));
             WindowInputEvent::KeyPress(key_event)
         }
-        KeyCode::Char('k') => {
+        KeyCode::Char('j') => {
             state.update_cursor_position(|(x, y)| (x, y + 1));
             WindowInputEvent::KeyPress(key_event)
         }
