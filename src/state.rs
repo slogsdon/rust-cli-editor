@@ -65,7 +65,7 @@ impl WindowState {
         let mut state = WindowState::new();
         if let Some(filename) = args.get(1) {
             state.content = std::fs::read_to_string(filename)
-                .unwrap_or(String::new())
+                .unwrap_or_default()
                 .lines()
                 .map(String::from)
                 .collect();
