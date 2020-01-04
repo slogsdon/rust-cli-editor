@@ -22,7 +22,8 @@ fn main() -> Result<()> {
 /// Responsible for handling input from the window/user and
 /// controlling application state / UI changes when needed.
 async fn main_loop() -> Result<()> {
-    let mut state = WindowState::new();
+    let args: Vec<String> = std::env::args().collect();
+    let mut state = WindowState::from_args(args);
 
     // initial render to ensure screen is cleared and cursor
     // is placed at the intended first position

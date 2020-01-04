@@ -9,3 +9,14 @@ fn new() {
     assert_eq!(cx, 0);
     assert_eq!(cy, 0);
 }
+
+#[test]
+fn from_args_can_read_file() {
+    let state = WindowState::from_args(vec![
+        String::from("editor"),
+        String::from("./tests/fixtures/file.txt"),
+    ]);
+    assert_ne!(state.content.len(), 0);
+    assert_eq!(state.content, vec!["a", "b"]);
+    assert_eq!(state.filename, "./tests/fixtures/file.txt");
+}

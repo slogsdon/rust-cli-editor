@@ -29,6 +29,7 @@ pub struct WindowState {
     pub dimensions: (u16, u16),
     /// Asynchronous event reader
     pub event_reader: EventStream,
+    pub filename: String,
     /// Vector of all window input events
     pub input_event_history: Vec<WindowInputEvent>,
     pub input_mode: InputMode,
@@ -53,10 +54,24 @@ impl WindowState {
             cursor_position: (0, 0),
             dimensions: get_window_dimensions(),
             event_reader: EventStream::new(),
+            filename: String::new(),
             input_event_history: Vec::new(),
             input_mode: InputMode::NormalMode,
             statusline_format: String::from("[{mode}] L: {line}, C: {column}"),
         }
+    }
+
+    pub fn from_args(args: Vec<String>) -> Self {
+        let mut state = WindowState::new();
+        if let Some(filename) = args.get(1) {
+            state.content = std::fs::read_to_string(filename)
+                .unwrap_or(String::new())
+                .lines()
+                .map(String::from)
+                .collect();
+            state.filename = filename.to_string();
+        }
+        state
     }
 
     pub fn last_content_line(&self) -> Option<&String> {
@@ -94,6 +109,7 @@ impl Clone for WindowState {
             cursor_position: self.cursor_position,
             dimensions: self.dimensions,
             event_reader: EventStream::new(),
+            filename: String::new(),
             input_event_history: Vec::new(),
             input_mode: self.input_mode,
             statusline_format: String::new(),
