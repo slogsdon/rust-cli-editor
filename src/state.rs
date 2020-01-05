@@ -57,7 +57,7 @@ impl WindowState {
             filename: String::new(),
             input_event_history: Vec::new(),
             input_mode: InputMode::NormalMode,
-            statusline_format: String::from("[{mode}] L: {line}, C: {column}"),
+            statusline_format: String::from("[{mode}] {filename} |L: {line}, C: {column}|"),
         }
     }
 

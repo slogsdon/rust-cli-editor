@@ -59,6 +59,7 @@ fn render_statusline(state: &WindowState) -> Result<()> {
                 .replace("{line}", line.as_str())
                 .replace("{column}", column.as_str())
                 .replace("{mode}", mode)
+                .replace("{filename}", state.filename.as_str())
         ),
     )
 }
