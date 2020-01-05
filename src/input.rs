@@ -24,6 +24,7 @@ pub enum WindowInputEvent {
     /// User has resized the terminal emulator window
     Resize(u16, u16),
     ChangeMode(InputMode, InputMode),
+    WriteFile,
 }
 
 impl From<Event> for WindowInputEvent {
@@ -132,6 +133,7 @@ fn handle_key_press_insert(state: &mut WindowState, key_event: KeyEvent) -> Wind
         std::mem::replace(&mut state.content[idx], line);
     }
 
+    state.has_content_changed = true;
     WindowInputEvent::KeyPress(key_event)
 }
 
@@ -157,5 +159,10 @@ fn parse_command(state: &mut WindowState) -> WindowInputEvent {
         return WindowInputEvent::Exit;
     }
 
+    if state.command.eq("w") && state.has_content_changed {
+        return WindowInputEvent::WriteFile;
+    }
+
+    state.command = String::new();
     WindowInputEvent::ChangeMode(state.input_mode, InputMode::NormalMode)
 }

@@ -30,6 +30,7 @@ pub struct WindowState {
     /// Asynchronous event reader
     pub event_reader: EventStream,
     pub filename: String,
+    pub has_content_changed: bool,
     /// Vector of all window input events
     pub input_event_history: Vec<WindowInputEvent>,
     pub input_mode: InputMode,
@@ -55,6 +56,7 @@ impl WindowState {
             dimensions: get_window_dimensions(),
             event_reader: EventStream::new(),
             filename: String::new(),
+            has_content_changed: false,
             input_event_history: Vec::new(),
             input_mode: InputMode::NormalMode,
             statusline_format: String::from("[{mode}] {filename} |L: {line}, C: {column}|"),
@@ -110,6 +112,7 @@ impl Clone for WindowState {
             dimensions: self.dimensions,
             event_reader: EventStream::new(),
             filename: String::new(),
+            has_content_changed: self.has_content_changed,
             input_event_history: Vec::new(),
             input_mode: self.input_mode,
             statusline_format: String::new(),

@@ -2,7 +2,7 @@ use crossterm::Result;
 
 use editor::{
     input::{accept_window_input, WindowInputEvent},
-    state::WindowState,
+    state::{InputMode, WindowState},
     terminal,
     ui::{render, reset_screen},
 };
@@ -35,7 +35,16 @@ async fn main_loop() -> Result<()> {
             Err(e) => return Err(e),
             Ok(WindowInputEvent::Exit) => return Ok(()),
             Ok(WindowInputEvent::NoOp) => continue,
-            Ok(_) => {
+            Ok(e) => {
+                if let WindowInputEvent::WriteFile = e {
+                    let line_sep = "\n";
+                    let mut content: String = state.content.join(line_sep);
+                    content.push_str(line_sep);
+                    std::fs::write(state.filename.clone(), content)?;
+                    state.input_mode = InputMode::NormalMode;
+                    state.command = String::new();
+                }
+
                 if let Err(e) = render(&state) {
                     return Err(e);
                 }

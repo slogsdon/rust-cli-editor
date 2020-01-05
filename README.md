@@ -10,7 +10,7 @@
 
 ### TODO
 
-- Read from / Write to file
+- Update content at cursor position
 - Easy command definitions
 - Language Server Protocol support?
 - Plugins?
