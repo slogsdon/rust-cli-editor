@@ -130,7 +130,7 @@ fn handle_key_press_insert(state: &mut WindowState, key_event: KeyEvent) -> Wind
         state.content.push(line);
     } else {
         let idx = state.content.len() - 1;
-        std::mem::replace(&mut state.content[idx], line);
+        state.content[idx] = line;
     }
 
     state.has_content_changed = true;
